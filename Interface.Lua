@@ -109,6 +109,93 @@ local InterfaceManager = {} do
 		end)
 		Library.MinimizeKeybind = MenuKeybind
     end
+
+	function InterfaceManager:BuildServerConfig(tab)
+		local section = tab:AddSection("Server")
+
+		local CopyServerID = section:AddButton({
+			Title = "Copy Server ID",
+			Description = "Copy the current PlaceId and ServerId to clipboard",
+			Callback = function()
+				local placeId = game.PlaceId
+				local serverId = game.JobId
+				local serverCode = string.format("%d,%s", placeId, serverId)
+		
+				setclipboard(serverCode)
+		
+				Fluent:Notify({
+					Title = "Server Code Copied",
+					Content = "The PlaceId and ServerId code has been copied to your clipboard.",
+					Duration = 5
+				})
+			end
+		})
+		
+		local InputServerID = section:AddInput("Input Server ID", {
+			Title = "Input Server ID",
+			Default = "",
+			Placeholder = "Enter the PlaceId,ServerId",
+			Numeric = false,
+			Finished = false,
+			Callback = function(Value)
+				print("Input changed:", Value)
+			end
+		})
+		
+		InputServerID:OnChanged(function()
+			print("Input updated:", InputServerID.Value)
+		end)
+		
+		local TeleportToInput = section:AddButton({
+			Title = "Teleport to Server",
+			Description = "Teleport your character to the coordinates in the input",
+			Callback = function()
+				local inputText = InputServerID.Value
+				local coords = {}
+		
+				if inputText and inputText:match("^(%d+),([%w-]+)$") then
+					for value in inputText:gmatch("([^,]+)") do
+						table.insert(coords, value)
+					end
+		
+					local placeId = tonumber(coords[1])
+					local serverId = coords[2]
+		
+					if placeId and serverId then
+						local success, message = pcall(function()
+							TeleportService:TeleportToPlaceInstance(placeId, serverId, game.Players.LocalPlayer)
+						end)
+		
+						if success then
+							Fluent:Notify({
+								Title = "Teleporting...",
+								Content = "Teleporting to the specified server...",
+								Duration = 5
+							})
+						else
+							Fluent:Notify({
+								Title = "Error",
+								Content = "Failed to teleport. Please check the PlaceId and ServerId.",
+								Duration = 5
+							})
+						end
+					else
+						Fluent:Notify({
+							Title = "Invalid Input",
+							Content = "Please enter a valid PlaceId,ServerId in the correct format.",
+							Duration = 5
+						})
+					end
+				else
+					Fluent:Notify({
+						Title = "Invalid Format",
+						Content = "Please enter the correct format: PlaceId,ServerId",
+						Duration = 5
+					})
+				end
+			end
+		})
+	end
 end
 
 return InterfaceManager
