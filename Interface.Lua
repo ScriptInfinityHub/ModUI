@@ -1,5 +1,4 @@
 local httpService = game:GetService("HttpService")
-local Fluent = loadstring(game:HttpGet("https://raw.githubusercontent.com/ScriptInfinityHub/ModUI/refs/heads/main/Lua"))()
 
 local InterfaceManager = {} do
 	InterfaceManager.Folder = "FluentSettings"
@@ -123,12 +122,6 @@ local InterfaceManager = {} do
 				local serverCode = string.format("%d,%s", placeId, serverId)
 		
 				setclipboard(serverCode)
-		
-				Fluent:Notify({
-					Title = "Server Code Copied",
-					Content = "The PlaceId and ServerId code has been copied to your clipboard.",
-					Duration = 5
-				})
 			end
 		})
 		
@@ -166,34 +159,6 @@ local InterfaceManager = {} do
 						local success, message = pcall(function()
 							TeleportService:TeleportToPlaceInstance(placeId, serverId, game.Players.LocalPlayer)
 						end)
-		
-						if success then
-							Fluent:Notify({
-								Title = "Teleporting...",
-								Content = "Teleporting to the specified server...",
-								Duration = 5
-							})
-						else
-							Fluent:Notify({
-								Title = "Error",
-								Content = "Failed to teleport. Please check the PlaceId and ServerId.",
-								Duration = 5
-							})
-						end
-					else
-						Fluent:Notify({
-							Title = "Invalid Input",
-							Content = "Please enter a valid PlaceId,ServerId in the correct format.",
-							Duration = 5
-						})
-					end
-				else
-					Fluent:Notify({
-						Title = "Invalid Format",
-						Content = "Please enter the correct format: PlaceId,ServerId",
-						Duration = 5
-					})
-				end
 			end
 		})
 	end
