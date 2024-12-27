@@ -112,6 +112,30 @@ local InterfaceManager = {} do
 
 	function InterfaceManager:BuildServerConfig(tab)
 		local section = tab:AddSection("Server")
+
+		local RejoinServer = section:AddButton({ 
+			Title = "Rejoin Server",
+			Description = "Rejoin the current server.",
+			Callback = function()
+				Window:Dialog({
+					Title = "Do you want to Rejoin Server?",
+					Content = "Rejoining will reconnect you to the same server.",
+					Buttons = {
+						{
+							Title = "Confirm",
+							Callback = function()
+								game:GetService("TeleportService"):Teleport(game.PlaceId, game.Players.LocalPlayer)
+							end
+						},
+						{
+							Title = "Cancel",
+							Callback = function()
+							end
+						}
+					}
+				})
+			end
+		})
 	
 		section:AddButton({
 			Title = "Copy Server ID",
