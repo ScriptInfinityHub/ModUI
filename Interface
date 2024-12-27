@@ -1,8 +1,8 @@
 local httpService = game:GetService("HttpService")
 
 local InterfaceManager = {} do
-	InterfaceManager.Folder = "FluentConfiguration"
-    InterfaceManager.Configuration = {
+	InterfaceManager.Folder = "FluentSettings"
+    InterfaceManager.Settings = {
         Theme = "Dark",
         Acrylic = true,
         Transparency = true,
@@ -27,7 +27,7 @@ local InterfaceManager = {} do
 		end
 
 		table.insert(paths, self.Folder)
-		table.insert(paths, self.Folder .. "/configuration")
+		table.insert(paths, self.Folder .. "/settings")
 
 		for i = 1, #paths do
 			local str = paths[i]
@@ -37,11 +37,11 @@ local InterfaceManager = {} do
 		end
 	end
 
-    function InterfaceManager:SaveConfiguration()
-        writefile(self.Folder .. "/options.json", httpService:JSONEncode(InterfaceManager.Configuration))
+    function InterfaceManager:SaveSettings()
+        writefile(self.Folder .. "/options.json", httpService:JSONEncode(InterfaceManager.Settings))
     end
 
-    function InterfaceManager:LoadConfiguration()
+    function InterfaceManager:LoadSettings()
         local path = self.Folder .. "/options.json"
         if isfile(path) then
             local data = readfile(path)
@@ -49,7 +49,7 @@ local InterfaceManager = {} do
 
             if success then
                 for i, v in next, decoded do
-                    InterfaceManager.Configuration[i] = v
+                    InterfaceManager.Settings[i] = v
                 end
             end
         end
@@ -58,9 +58,9 @@ local InterfaceManager = {} do
     function InterfaceManager:BuildInterfaceSection(tab)
         assert(self.Library, "Must set InterfaceManager.Library")
 		local Library = self.Library
-        local Configuration = InterfaceManager.Configuration
+        local Settings = InterfaceManager.Settings
 
-        InterfaceManager:LoadConfiguration()
+        InterfaceManager:LoadSettings()
 
 		local section = tab:AddSection("Interface")
 
@@ -68,25 +68,25 @@ local InterfaceManager = {} do
 			Title = "Theme",
 			Description = "Changes the interface theme.",
 			Values = Library.Themes,
-			Default = Configuration.Theme,
+			Default = Settings.Theme,
 			Callback = function(Value)
 				Library:SetTheme(Value)
-                Configuration.Theme = Value
-                InterfaceManager:SaveConfiguration()
+                Settings.Theme = Value
+                InterfaceManager:SaveSettings()
 			end
 		})
 
-        InterfaceTheme:SetValue(Configuration.Theme)
+        InterfaceTheme:SetValue(Settings.Theme)
 	
 		if Library.UseAcrylic then
 			section:AddToggle("AcrylicToggle", {
 				Title = "Acrylic",
 				Description = "The blurred background requires graphic quality 8+",
-				Default = Configuration.Acrylic,
+				Default = Settings.Acrylic,
 				Callback = function(Value)
 					Library:ToggleAcrylic(Value)
-                    Configuration.Acrylic = Value
-                    InterfaceManager:SaveConfiguration()
+                    Settings.Acrylic = Value
+                    InterfaceManager:SaveSettings()
 				end
 			})
 		end
@@ -94,21 +94,19 @@ local InterfaceManager = {} do
 		section:AddToggle("TransparentToggle", {
 			Title = "Transparency",
 			Description = "Makes the interface transparent.",
-			Default = Configuration.Transparency,
+			Default = Settings.Transparency,
 			Callback = function(Value)
 				Library:ToggleTransparency(Value)
-				Configuration.Transparency = Value
-                InterfaceManager:SaveConfiguration()
+				Settings.Transparency = Value
+                InterfaceManager:SaveSettings()
 			end
 		})
 	
-		local MenuKeybind = section:AddKeybind("MenuKeybind", { Title = "Minimize Bind", Default = Configuration.MenuKeybind })
+		local MenuKeybind = section:AddKeybind("MenuKeybind", { Title = "Minimize Bind", Default = Settings.MenuKeybind })
 		MenuKeybind:OnChanged(function()
-			Configuration.MenuKeybind = MenuKeybind.Value
-            InterfaceManager:SaveConfiguration()
+			Settings.MenuKeybind = MenuKeybind.Value
+            InterfaceManager:SaveSettings()
 		end)
 		Library.MinimizeKeybind = MenuKeybind
     end
 end
-
-return InterfaceManager
